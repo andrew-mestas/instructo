@@ -1,0 +1,109 @@
+0 info it worked if it ends with ok
+1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
+1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
+1 verbose cli   'publish' ]
+2 info using npm@3.10.9
+3 info using node@v7.1.0
+4 verbose publish [ '.' ]
+5 silly cache add args [ '.', null ]
+6 verbose cache add spec .
+7 silly cache add parsed spec Result {
+7 silly cache add   raw: '.',
+7 silly cache add   scope: null,
+7 silly cache add   escapedName: null,
+7 silly cache add   name: null,
+7 silly cache add   rawSpec: '.',
+7 silly cache add   spec: 'C:\\Users\\v-anmest\\Desktop\\instructo',
+7 silly cache add   type: 'directory' }
+8 verbose addLocalDirectory C:\Users\v-anmest\AppData\Roaming\npm-cache\instructo\1.0.9\package.tgz not in flight; packing
+9 verbose correctMkdir C:\Users\v-anmest\AppData\Roaming\npm-cache correctMkdir not in flight; initializing
+10 info lifecycle instructo@1.0.9~prepublish: instructo@1.0.9
+11 silly lifecycle instructo@1.0.9~prepublish: no script for prepublish, continuing
+12 verbose tar pack [ 'C:\\Users\\v-anmest\\AppData\\Roaming\\npm-cache\\instructo\\1.0.9\\package.tgz',
+12 verbose tar pack   'C:\\Users\\v-anmest\\Desktop\\instructo' ]
+13 verbose tarball C:\Users\v-anmest\AppData\Roaming\npm-cache\instructo\1.0.9\package.tgz
+14 verbose folder C:\Users\v-anmest\Desktop\instructo
+15 verbose addLocalTarball adding from inside cache C:\Users\v-anmest\AppData\Roaming\npm-cache\instructo\1.0.9\package.tgz
+16 verbose correctMkdir C:\Users\v-anmest\AppData\Roaming\npm-cache correctMkdir not in flight; initializing
+17 silly cache afterAdd instructo@1.0.9
+18 verbose afterAdd C:\Users\v-anmest\AppData\Roaming\npm-cache\instructo\1.0.9\package\package.json not in flight; writing
+19 verbose correctMkdir C:\Users\v-anmest\AppData\Roaming\npm-cache correctMkdir not in flight; initializing
+20 verbose afterAdd C:\Users\v-anmest\AppData\Roaming\npm-cache\instructo\1.0.9\package\package.json written
+21 silly publish { name: 'instructo',
+21 silly publish   version: '1.0.9',
+21 silly publish   description: 'Restructure JavaScript objects for analysis ',
+21 silly publish   main: 'instructo.js',
+21 silly publish   scripts: { test: 'echo "Error: no test specified" && exit 1' },
+21 silly publish   repository:
+21 silly publish    { type: 'git',
+21 silly publish      url: 'git+https://github.com/andrew-mestas/instructo.git' },
+21 silly publish   keywords: [ 'javascript', 'object', 'analysis', 'restructure', 'data' ],
+21 silly publish   author: { name: 'Andrew Mestas' },
+21 silly publish   license: 'Apache-2.0',
+21 silly publish   bugs: { url: 'https://github.com/andrew-mestas/instructo/issues' },
+21 silly publish   homepage: 'https://github.com/andrew-mestas/instructo#readme',
+21 silly publish   readme: '# instructo\r\nRestructure JavaScript objects for analysis - look withIN the STRUCTure of the Object \r\n\r\n##Example\r\n\r\nGiven a list of flat objects in which only the keys are known answer the following questions.\r\nKeys = name, age, group \r\n\r\n Who is in each group?\r\n   leads to question how many groups are there?\r\n   you can get the object return array of unique groups \r\n   then for each filter and map into a new object.\r\n       \r\n Who is the same age?\r\n   Same thing we need to know something about the age \r\n   in order to filter and map\r\n\r\nWhat if we could restructure the object into something useful\r\nwhere the solution lies in the structure. \r\n\r\n```javascript\r\n  var arrayOfObjects = [\r\n    {\r\n      name: \'Johnny\',\r\n      age: 21,\r\n      group: 2\r\n    },\r\n    {\r\n      name: \'Jimmy\',\r\n      age: 34,\r\n      group: 1\r\n    },\r\n    {\r\n      name: \'Sally\',\r\n      age: 27,\r\n      group: 2\r\n    },\r\n    {\r\n      name: \'Mary\',\r\n      age: 44,\r\n      group: 2\r\n    },\r\n    {\r\n      name: \'Billy\',\r\n      age: 21,\r\n      group: 1\r\n    }\r\n  ];\r\n\r\n  // List all groups with name and age\r\n  var structureA = [\r\n    {\r\n      key: \'group\',\r\n      type: \'object\'\r\n    },\r\n    {\r\n      key: \'name\',\r\n      type: \'object\'\r\n    },\r\n    {\r\n      key: \'age\',\r\n      type: \'object\'\r\n    }\r\n  ];\r\n\r\n  // List all ages with name \r\n  var structureB = [\r\n    {\r\n      key: \'age\',\r\n      type: \'object\'\r\n    },\r\n    {\r\n      key: \'name\',\r\n      type: \'object\'\r\n    }\r\n  ];\r\n\r\n  var RsA = new instructo(arrayOfObjects)\r\n              .createObject(structureA)\r\n              .results;\r\n  var RsB = new instructo(arrayOfObjects)\r\n              .createObject(structureB)\r\n              .results;\r\n      \r\n// RsA Who is in each group?\r\n  for(var a in RsA){\r\n    console.log("Group:", a, "Has:", Object.keys(RsA[a]));\r\n  }\r\n// Group: 21 Has: Johnny Billy \r\n// Group: 27 Has: Sally \r\n// Group: 34 Has: Jimmy \r\n// Group: 44 Has: Mary\r\n\r\n{\r\n  1: {\r\n    Billy : {\r\n      21: {}\r\n    },\r\n    Jimmy: {\r\n      34: {}\r\n    }\r\n  },\r\n  2: {\r\n    Johnny: {\r\n      21: {}\r\n    },\r\n    Mary: {\r\n      44: {}\r\n    },\r\n    Sally: {\r\n      27: {}\r\n    }\r\n  }\r\n}\r\n\r\n// RsC Who is the same age?\r\n  var message = \'\';\r\n  for(var a in RsB){\r\n    if(Object.keys(RsB[a]).length > 1){\r\n    Object.keys(RsB[a]).forEach((c)=>{message += c + \' \';});\r\n    console.log(message, "have the same age of: ", a);\r\n    }\r\n  }\r\n// Johnny Billy  have the same age of:  21\r\n\r\n{\r\n  21: {\r\n    Billy: {},\r\n    Johnny: {}\r\n  },\r\n  27: {\r\n    Sally: {}\r\n  },\r\n  34: {\r\n    Jimmy: {}\r\n  },\r\n  44: {\r\n    Mary: {}\r\n  }\r\n}\r\n\r\n```\r\n',
+21 silly publish   readmeFilename: 'README.md',
+21 silly publish   gitHead: '3efef87c983901498d87e241acd5d077870fd9b7',
+21 silly publish   _id: 'instructo@1.0.9',
+21 silly publish   _shasum: 'b4c519da58aa427983f0f31372e30317a3ffff8c',
+21 silly publish   _from: '.' }
+22 verbose getPublishConfig undefined
+23 silly mapToRegistry name instructo
+24 silly mapToRegistry using default registry
+25 silly mapToRegistry registry https://registry.npmjs.org/
+26 silly mapToRegistry data Result {
+26 silly mapToRegistry   raw: 'instructo',
+26 silly mapToRegistry   scope: null,
+26 silly mapToRegistry   escapedName: 'instructo',
+26 silly mapToRegistry   name: 'instructo',
+26 silly mapToRegistry   rawSpec: '',
+26 silly mapToRegistry   spec: 'latest',
+26 silly mapToRegistry   type: 'tag' }
+27 silly mapToRegistry uri https://registry.npmjs.org/instructo
+28 verbose publish registryBase https://registry.npmjs.org/
+29 silly publish uploading C:\Users\v-anmest\AppData\Roaming\npm-cache\instructo\1.0.9\package.tgz
+30 verbose request uri https://registry.npmjs.org/instructo
+31 verbose request sending authorization for write operation
+32 info attempt registry request try #1 at 12:14:25 AM
+33 verbose request using bearer token for auth
+34 verbose request id 1b7f4beb88cf7727
+35 http request PUT https://registry.npmjs.org/instructo
+36 http 403 https://registry.npmjs.org/instructo
+37 verbose headers { 'content-type': 'application/json',
+37 verbose headers   'cache-control': 'max-age=300',
+37 verbose headers   'content-length': '95',
+37 verbose headers   'accept-ranges': 'bytes',
+37 verbose headers   date: 'Fri, 06 Jan 2017 08:14:26 GMT',
+37 verbose headers   via: '1.1 varnish',
+37 verbose headers   connection: 'keep-alive',
+37 verbose headers   'x-served-by': 'cache-sjc3623-SJC',
+37 verbose headers   'x-cache': 'MISS',
+37 verbose headers   'x-cache-hits': '0',
+37 verbose headers   'x-timer': 'S1483690466.430779,VS0,VE205',
+37 verbose headers   vary: 'Accept-Encoding' }
+38 verbose request invalidating C:\Users\v-anmest\AppData\Roaming\npm-cache\registry.npmjs.org\instructo on PUT
+39 error publish Failed PUT 403
+40 verbose stack Error: "You cannot publish over the previously published version 1.0.9." : instructo
+40 verbose stack     at makeError (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-client\lib\request.js:302:12)
+40 verbose stack     at CachingRegistryClient.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-client\lib\request.js:290:14)
+40 verbose stack     at Request._callback (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-registry-client\lib\request.js:210:14)
+40 verbose stack     at Request.self.callback (C:\Program Files\nodejs\node_modules\npm\node_modules\request\request.js:187:22)
+40 verbose stack     at emitTwo (events.js:106:13)
+40 verbose stack     at Request.emit (events.js:191:7)
+40 verbose stack     at Request.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\request\request.js:1048:10)
+40 verbose stack     at emitOne (events.js:96:13)
+40 verbose stack     at Request.emit (events.js:188:7)
+40 verbose stack     at IncomingMessage.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\request\request.js:969:12)
+41 verbose statusCode 403
+42 verbose pkgid instructo
+43 verbose cwd C:\Users\v-anmest\Desktop\instructo
+44 error Windows_NT 10.0.14393
+45 error argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "publish"
+46 error node v7.1.0
+47 error npm  v3.10.9
+48 error code E403
+49 error "You cannot publish over the previously published version 1.0.9." : instructo
+50 error If you need help, you may report this error at:
+50 error     <https://github.com/npm/npm/issues>
+51 verbose exit [ 1, true ]
