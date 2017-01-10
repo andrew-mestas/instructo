@@ -1,6 +1,6 @@
 {
   "name": "instructo",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Restructure JavaScript objects for analysis ",
   "main": "instructo.js",
   "scripts": {
