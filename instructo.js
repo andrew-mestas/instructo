@@ -149,7 +149,7 @@
     // of name within returned obj
     /////////////////////////////////
     instructo.prototype.getOccurences = function(name, filter, condition, exact) {
-      var subset = this.filterAndChrono(filter, condition, exact);      
+      var subset = this.filterAndChrono(filter, condition, exact, name);      
       subset = subset.filter((x)=>{return x});
       this.filtered = new instructo(subset).createObject(this.keys);
       var results = this.depth >= 1 ? this.filtered.dive() : this.filtered.results;
@@ -157,22 +157,22 @@
     }
 
     instructo.prototype.validateFilter = function(filterC){
-      return filterC ? filterC : [];
+      return filterC.filter((x)=>{if(x.value !== '' && x.value !== undefined){return true}; return false;})
     }
 
     instructo.prototype.exclude = function(arr, value) {
       return arr.filter((c)=>{return c !== value});
     }
 
-    instructo.prototype.group = function(value) {
+    instructo.prototype.group = function(con) {
       return this.array.map((x)=>{
         return this.array.filter((c)=>{
-          return c[value] === x[value]
+          return (c[con.value] === x[con.value] && c[con.key] === x[con.key]);
         })
       })
     }
 
-    instructo.prototype.filterAndChrono = function(filter, condition, exact) {
+    instructo.prototype.filterAndChrono = function(filter, condition, exact, name) {
       var top = [];
       var t = [];
       var count = 0;
@@ -200,10 +200,10 @@
                 return  tally.true === count;     
               }              
             });
-
+          
        if(condition && condition.has !== ''){
           var y = new instructo().setArray(t).createObject(this.keys);
-          var groupedItems = y.group(condition.key);          
+          var groupedItems = y.group(condition);
           for(var item in groupedItems){
             var newest = undefined;
             groupedItems[item].forEach((x)=>{
@@ -226,7 +226,6 @@
       } else {
         return this.array
       }
-
     }
-
+    
     module.exports=instructo;
