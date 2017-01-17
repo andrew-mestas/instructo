@@ -12,27 +12,49 @@
     this.keys = keys;
     this.depth = this.keys.map((x, idx)=>{ if(x.type === 'array'){return idx}}).filter((c)=>{return c!==undefined})[0];
     this.results = result;
-    this.array.forEach((item) => {
-      result = this.results;
-      keys.forEach((field) => {
-        if(field.type === 'object'){
-          if(!result.hasOwnProperty(item[field.key])){
-            result[item[field.key]] = {};
+    var ins = this.results;
+
+    function doThis(arr){
+      return new Promise((rr,rj)=>{
+      rr(
+        arr.forEach((item) => {
+        result = ins;
+        keys.forEach((field) => {
+          if(field.type === 'object'){
+            if(!result.hasOwnProperty(item[field.key])){
+              result[item[field.key]] = {};
+            }
+          }          
+          else if(field.type === 'array'){
+            if(!result.hasOwnProperty(item[field.key])){
+              result[item[field.key]] = [];
+            }
           }
-        }          
-        else if(field.type === 'array'){
-          if(!result.hasOwnProperty(item[field.key])){
-            result[item[field.key]] = [];
+          else if(field.type === 'item'){
+            if(result.indexOf(item[field.key]) < 0 ){
+              result.push(item[field.key])
+            }
           }
-        }
-        else if(field.type === 'item'){
-          if(result.indexOf(item[field.key]) < 0 ){
-            result.push(item[field.key])
-          }
-        }
-        result = result[item[field.key]];
+          result = result[item[field.key]];
+        })
       })
+    )
     })
+    }
+    
+    if(this.array.length > 100){
+      var div = Math.round(this.array.length / 20);
+      var segments = new Array(div);
+ 	    var inc = Math.round(this.array.length/div);
+      for(var i=0;i<div;i++){
+        segments[i] = doThis(this.array.slice((i*inc),(inc+inc*i) > this.array.length ? this.array.length : inc+inc*i));
+      } 
+      Promise.all(segments);
+    } else {
+      doThis(this.array)
+    }
+
+    
     return this;
   }
 
@@ -49,10 +71,34 @@
   // Gets unique names from array 
   // of objects
   /////////////////////////////////
-  instructo.prototype.getUniqueNames = function(arr, key){
-    return arr.map(function(obj){
-      return obj[key];
-    }).filter(this.onlyUnique);
+  instructo.prototype.getUniqueNames = function(arr, keys){
+    var key;
+    var results = {}; 
+
+    if(typeof(keys) === 'object' && keys.length > 1){
+      arr.forEach((item) => {
+        keys.forEach((key)=>{
+          try{
+            results[key].indexOf(item[key])
+          }catch(e){
+            results[key] = []; 
+          }
+          if(results[key].indexOf(item[key]) >= 0){ }
+          else {
+             results[key].push(item[key]);
+          }
+        
+        })       
+      })
+      return results;
+    } else {
+      key = keys;
+      return arr.map(function(obj){
+        return obj[key];
+      }).filter(this.onlyUnique);
+    }
+
+    
   }
 
   ////////////////////////////////
@@ -79,9 +125,11 @@
   ////////////////////////////////
   instructo.prototype.flattenO = function(arr) {
     var obj = {};
-    for(var i = 0; i < arr.length; i++){
+    var len = arr.length;
+    var t;
+    for(var i = 0; i < len; i++){
         for(x in arr[i]){
-          var t = x;
+          t = x;
           while(obj.hasOwnProperty(t)){
             t += '_';
           }
@@ -131,14 +179,16 @@
     instructo.prototype.dive = function(obj = this.results) {
       var top = obj;
       var count = 0;
-      var stack = [];
-
+      var stack = new Array(Object.keys(top).length);
+      var idx = 0;
       while(count < this.depth){
         for(var x in top){
-          stack.push(top[x])
+          stack[idx] = top[x];
+          idx +=1;
         }
         top = this.flattenO(stack);
-        stack = [];
+        stack = new Array(Object.keys(top).length);
+        idx = 0;        
         count++;
       }
      return top;         
@@ -149,9 +199,7 @@
     // of name within returned obj
     /////////////////////////////////
     instructo.prototype.getOccurences = function(name, filter, condition, exact) {
-      var subset = this.filterAndChrono(filter, condition, exact, name);      
-      subset = subset.filter((x)=>{return x});
-      this.filtered = new instructo(subset).createObject(this.keys);
+      this.filterAndChrono(filter, condition, exact, name);      
       var results = this.depth >= 1 ? this.filtered.dive() : this.filtered.results;
       return this.getCounts(results, this.filtered.array.map((x)=>{ return x[name]; }).filter(this.onlyUnique));
     }
@@ -173,57 +221,66 @@
     }
 
     instructo.prototype.filterAndChrono = function(filter, condition, exact, name) {
-      var top = [];
       var t = [];
       var count = 0;
+      var array = this.array;
+      var tally;
+      var results = [];
+      var filterValues = this.validateFilter(filter);
       if(filter !== undefined){
-        var filterValues = this.validateFilter(filter);
-        var array = this.array;
-        t = array.filter((x)=> {
-              count=0;          
-              var results = filterValues.map((c)=>{
-                if(c.value !== ''){
-                    count+=1;
-                    if(x[c.key] === c.value){
-                      return true;
-                    } else {
-                      return false;
+        if(filterValues.length !== 0) {          
+          t = array.filter((x)=> {
+                count=0;          
+                results = filterValues.map((c)=>{
+                  if(c.value !== ''){
+                      count+=1;
+                      if(x[c.key] === c.value){
+                        return true;
+                      } else {
+                        return false;
+                      }
                     }
-                  }
-                  return false;                  
-                });
-              var tally = this.getCounts({ r: results}, results.map((x)=>{return x}));
+                    return false;                  
+                  });
+                tally = this.getCounts({ r: results}, results.map((x)=>{return x}));
 
-              if(exact){
-                return tally.false === 0;
-              } else {
-                return  tally.true === count;     
-              }              
+                if(exact){
+                  return tally.false === 0;
+                } else {
+                  return  tally.true === count;     
+                }              
             });
+        }
           
        if(condition && condition.has !== ''){
           var y = new instructo().setArray(t).createObject(this.keys);
           var groupedItems = y.group(condition);
+          var top = new Array(groupedItems.length);
+          var idx = 0;
+          var groupedSingle = [];
+          var newest = undefined;
           for(var item in groupedItems){
-            var newest = undefined;
             groupedItems[item].forEach((x)=>{
               newest = newest === undefined 
                     ? x[condition.chrono] 
                     : (x[condition.chrono] >= newest) ?
                     x[condition.chrono] : newest;
             });
-            top.push(groupedItems[item].filter((c)=>{
+            groupedSingle = groupedItems[item].filter((c)=>{
               return (c[condition.chrono] === newest && c[condition.value] === condition.has);
-            }));
-          }          
-          top = top.map((x) => {
-            return x[0];
-          })
-          return top
-        }
-        return t.length === 0 ? this.array : t;
-       
+            })[0];
+            if(groupedSingle !== undefined){
+              top[idx] = groupedSingle;
+              idx += 1;
+            }            
+          }
+          this.filtered = new instructo(top).createObject(this.keys);
+        } else {
+          this.filtered = t.length === 0 ? this : new instructo(t).createObject(this.keys);
+        }       
       } else {
-        return this.array
+        this.filtered = this;
       }
     }
+    
+    
