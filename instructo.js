@@ -282,5 +282,6 @@
         this.filtered = this;
       }
     }
+    module.exports=instructo;
     
     
